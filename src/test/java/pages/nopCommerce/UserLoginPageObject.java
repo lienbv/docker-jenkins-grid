@@ -1,10 +1,10 @@
-package pageObjects.nopCommerce.user;
+package pages.nopCommerce;
 
-import commons.BasePage;
-import commons.PageGeneratorManager;
+import Interfaces.pageUIs.LoginPageUI;
+import actions.common.BasePage;
+import actions.common.PageGeneratorManager;
 import io.qameta.allure.Step;
-import pageUIs.nopCommerce.user.LoginPageUI;
-
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
 public class UserLoginPageObject extends BasePage {
@@ -45,6 +45,11 @@ public class UserLoginPageObject extends BasePage {
         return  getElementText(driver,LoginPageUI.UNSUCCESSFUL_ERROR_MESSAGE);
     }
 
+    public String getElementValueByJSXpath(WebDriver driver, String xpathLocator) {
+        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+        xpathLocator =xpathLocator.replace("xpath=", "");
+        return	(String) jsExecutor.executeScript("return $(document.evaluate(\"" + xpathLocator + "\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue).val()");
+    }
 
 	public UserHomePageObject loginAsUser(String emailAddress, String password) {
 		

@@ -1,4 +1,4 @@
-package pageUIs.liveTech.admin;
+package Interfaces.pageUIs.liveTech.admin;
 
 public class AdminLoginPageUI {
 	public static final String USER_NAME_TEXT_BOX ="xpath=//input[@id='username']";

@@ -1,4 +1,4 @@
-package pageUIs.nopCommerce.user;
+package Interfaces.pageUIs;
 
 public class LoginPageUI {
 

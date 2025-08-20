@@ -1,0 +1,33 @@
+{
+  "capabilities": [
+    {
+      "browserName": "chrome",
+      "maxInstances": 5,
+      "seleniumProtocol": "WebDriver"
+    },
+    {
+      "browserName": "firefox",
+      "maxInstances": 5,
+      "seleniumProtocol": "WebDriver"
+    },
+    {
+      "browserName": "edge",
+      "maxInstances": 5,
+      "seleniumProtocol": "WebDriver"
+    }
+  ],
+  "configuration": {
+    "port": 5555,
+    "hubHost": "192.168.0.104",
+    "hubPort": 4444,
+    "register": true,
+    "registerCycle": 5000,
+    "maxSession": 5,
+    "nodeTimeout": 120,
+    "unregisterIfStillDownAfter": 60000,
+    "downPollingLimit": 2,
+    "role": "node",
+    "debug": false,
+    "proxy": "org.openqa.grid.selenium.proxy.DefaultRemoteProxy"
+  }
+}

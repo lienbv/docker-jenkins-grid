@@ -1,4 +1,4 @@
-package common;
+package actions.common;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -267,6 +267,21 @@ public class BasePage {
 
     public String getElementText(WebDriver driver, String locatorType, String... dynamicValues) {
         return getWebElement(driver, getDynamicXpath(locatorType, dynamicValues)).getText();
+    }
+
+    public boolean isElementDisplayed(WebDriver driver, String locatorType, String... dynamicValues) {
+        return getWebElement(driver, getDynamicXpath(locatorType, dynamicValues)).isDisplayed();
+    }
+
+    public Alert waitForAlertPresent(WebDriver driver) {
+        WebDriverWait explicitWait = new WebDriverWait(driver, Duration.ofSeconds(longTimeout));
+        return explicitWait.until(ExpectedConditions.alertIsPresent()); // hàm trả về 1 alert, và hàm alertIsPresent nó
+        // đã switch qua alert roi
+    }
+
+    public void accepptAlert(WebDriver driver) {
+        waitForAlertPresent(driver).accept();
+
     }
 
     private long longTimeout = GlobalConstants.LONG_TIMEOUT;

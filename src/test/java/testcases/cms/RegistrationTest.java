@@ -1,4 +1,4 @@
-package testcases.techpanda;
+package testcases.cms;
 
 import actions.common.BaseTest;
 import org.testng.Assert;

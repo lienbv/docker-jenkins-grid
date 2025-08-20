@@ -1,4 +1,4 @@
-package pageUIs.liveTech.admin;
+package Interfaces.pageUIs.liveTech.admin;
 
 public class AdminCustomnerPageUI {
 		public static final String 	POP_UP ="xpath=//div[@id='message-popup-window']";

@@ -1,10 +1,9 @@
-package pageObects.techpanda.admin;
+package actions.pageObjects.techpanda.admin;
 
+import Interfaces.pageUIs.liveTech.admin.AdminLoginPageUI;
+import actions.common.BasePage;
 import org.openqa.selenium.WebDriver;
-
-import commons.BasePage;
-import pageObjects.techpanda.user.PageGenerator;
-import pageUIs.liveTech.admin.AdminLoginPageUI;
+import pages.techpanda.PageGenerator;
 
 public class AdminLoginPageObject extends BasePage {
 	WebDriver driver;

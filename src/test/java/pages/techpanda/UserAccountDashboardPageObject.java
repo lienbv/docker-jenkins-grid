@@ -1,8 +1,8 @@
-package pages.user;
+package pages.techpanda;
 
-import commons.BasePage;
+import Interfaces.pageUIs.liveTech.user.UserAccountDashBoardPageUI;
+import actions.common.BasePage;
 import org.openqa.selenium.WebDriver;
-import pageUIs.liveTech.user.UserAccountDashBoardPageUI;
 
 public class UserAccountDashboardPageObject extends BasePage {
 	private WebDriver driver;

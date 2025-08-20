@@ -1,4 +1,4 @@
-package factoryEnvironment;
+package actions.factoryEnvironment;
 
 public enum EnvironmentList {
     DEV, TESTING, STAGING, PRE_PRODUCTION, PROD;

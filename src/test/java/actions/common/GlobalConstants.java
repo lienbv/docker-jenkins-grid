@@ -1,4 +1,4 @@
-package common;
+package actions.common;
 
 import java.io.File;
 

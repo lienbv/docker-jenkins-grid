@@ -1,2 +1,5 @@
-package pages;public class RegisterPageObject {
+package pages;
+
+public class RegisterPageObject {
+
 }

@@ -1,14 +1,15 @@
 package pages.nopCommerce;
 
 import Interfaces.pageUIs.RegisterPageUI;
-import common.BasePage;
+import actions.common.BasePage;
+import actions.common.PageGeneratorManager;
 import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 
-public class RegistrationPage extends BasePage {
+public class UserRegisterPageObject extends BasePage {
     private WebDriver driver;
 
-    public RegistrationPage(WebDriver driver) {
+    public UserRegisterPageObject(WebDriver driver) {
         this.driver = driver;
     }
 
@@ -60,6 +61,18 @@ public class RegistrationPage extends BasePage {
         sendkeyToElement(driver,RegisterPageUI.EMAIL_TEXTBOX,emailAddres);
     }
 
+    @Step("Enter to Company textbox with value is {0}")
+    public void inputTCompanyTextbox(String company) {
+        waitForElementVisible(driver,RegisterPageUI.COMPANY_TEXTBOX);
+        sendkeyToElement(driver,RegisterPageUI.EMAIL_TEXTBOX, company);
+    }
+
+    @Step("Select to newsletter ")
+    public void selectNewsletter() {
+        waitForElementClickable(driver, RegisterPageUI.NEWSLETTER);
+        selectCheckBox(driver, RegisterPageUI.NEWSLETTER);
+    }
+
     @Step("Enter to Password textbox with value is {0}")
     public void inputToPasswordTextbox(String password) {
         waitForElementVisible(driver,RegisterPageUI.PASSWORD_TEXTBOX);
@@ -80,12 +93,12 @@ public class RegistrationPage extends BasePage {
     }
 
 
-//    public UserHomePageObject clickToLogoutLink() {
-//        waitForElementClickable(driver, RegisterPageUI.LOGOUT_LINK);
-//        clickToElement(driver,RegisterPageUI.LOGOUT_LINK);
-//        //2 return new HomePageObject(driver);
-//        return PageGeneratorManager.getUserHomePage(driver);
-//    }
+    public UserHomePageObject clickToLogoutLink() {
+        waitForElementClickable(driver, RegisterPageUI.LOGOUT_LINK);
+        clickToElement(driver,RegisterPageUI.LOGOUT_LINK);
+        //2 return new HomePageObject(driver);
+        return PageGeneratorManager.getUserHomePage(driver);
+    }
 
     public String getErrorExistingEmailMessage() {
         waitForElementClickable(driver, RegisterPageUI.EXISTING_EMAIL_ERROR_MESSAGE);

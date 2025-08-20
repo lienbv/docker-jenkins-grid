@@ -1,7 +1,8 @@
-package common;
+package actions.common;
 
-import factoryEnvironment.EnvironmentList;
+import actions.factoryEnvironment.EnvironmentList;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -13,8 +14,14 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
 
+import java.io.File;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
 public class BaseTest {
     protected WebDriver driver;
+    long time = 15;
+
 
     @BeforeClass
     @Parameters("browser")
@@ -22,8 +29,18 @@ public class BaseTest {
         if (browser.equalsIgnoreCase("chrome")) {
             WebDriverManager.chromedriver().setup();
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("--start-maximized", "--disable-notifications");
+            options.addArguments("user-data-dir=C:\\Users\\ADMIN\\AppData\\Local\\Google\\Chrome\\User Data\\");
+            options.addArguments("profile-directory=Profile 3");
+            options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+            options.setExperimentalOption("useAutomationExtension", false);
+            options.addArguments("--disable-blink-features=AutomationControlled");
+
             driver = new ChromeDriver(options);
+            // 🔥 Viết ở đây, sau khi driver được khởi tạo
+            ((JavascriptExecutor) driver).executeScript("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})");
+
+            driver.manage().timeouts().implicitlyWait(time, TimeUnit.SECONDS);
+            driver.manage().window().maximize();
 
         } else if (browser.equalsIgnoreCase("firefox")) {
             WebDriverManager.firefoxdriver().setup();
@@ -32,10 +49,9 @@ public class BaseTest {
             driver = new FirefoxDriver(options);
 
         } else if (browser.equalsIgnoreCase("edge")) {
-            WebDriverManager.edgedriver().setup();
-            EdgeOptions options = new EdgeOptions();
-            options.addArguments("--start-maximized");
-            driver = new EdgeDriver(options);
+            driver = new EdgeDriver();
+            driver.manage().timeouts().implicitlyWait(time, TimeUnit.SECONDS);
+            driver.manage().window().maximize();
 
         } else {
             throw new IllegalArgumentException("Trình duyệt không được hỗ trợ: " + browser);
@@ -74,10 +90,30 @@ public class BaseTest {
         return System.currentTimeMillis();
     }
 
+    public WebDriver getDriverInstance() {
+        return this.driver;
+    }
     @AfterClass
     public void tearDown() {
         if (driver != null) {
 //            driver.quit();
+        }
+    }
+
+    public void deleteAllureReport() {
+        try {
+
+            String pathFolderDownload = GlobalConstants.PROJECT_PATH + "/allure-json";
+            File file = new File(pathFolderDownload);
+            File[] listOfFiles = file.listFiles();
+            for (int i = 0; i < listOfFiles.length; i++) {
+                if (listOfFiles[i].isFile()) {
+                    System.out.println(listOfFiles[i].getName());
+                    new File(listOfFiles[i].toString()).delete();
+                }
+            }
+        } catch (Exception e) {
+            System.out.print(e.getMessage());
         }
     }
 }

@@ -1,5 +1,7 @@
-package pages.user;
+package pages.techpanda;
 
+import actions.pageObjects.techpanda.admin.AdminCustomerPageObject;
+import actions.pageObjects.techpanda.admin.AdminLoginPageObject;
 import org.openqa.selenium.WebDriver;
 
 public class PageGenerator {

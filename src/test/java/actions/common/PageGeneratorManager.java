@@ -1,4 +1,4 @@
-package common;
+package actions.common;
 
 import org.openqa.selenium.WebDriver;
 import pages.nopCommerce.UserHomePageObject;
