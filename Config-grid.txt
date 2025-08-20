@@ -1,0 +1,71 @@
+1️⃣ Standalone Mode
+Câu lệnh:  java -jar selenium-server-4.4.0.jar standalone
+Đặc điểm:
+Hub + Node gộp chung vào một process duy nhất.
+Cực nhanh để thiết lập, chỉ cần một lệnh duy nhất.
+Thích hợp cho máy cá nhân hoặc khi test nhỏ.
+Tất cả browser drivers (ChromeDriver, GeckoDriver, …) cần được cài sẵn trên máy.
+Nhược: Không chia tách hub/node nên khó mở rộng sang nhiều máy.
+
+📌 Khi dùng: muốn chạy automation local nhanh mà không cần config phức tạp.
+
+2️⃣ Classical Mode (Hub - Node)
+Ý tưởng:
+Một Hub nhận request từ test script. java -jar selenium-server-<version>.jar node --hub http://<hub-ip>:4444
+Một hoặc nhiều Node (có thể cùng hoặc khác máy) chạy trình duyệt thực tế.
+Lệnh chạy Hub: java -jar selenium-server-4.4.0.jar hub
+
+Node cùng máy: java -jar selenium-server-4.4.0.jar node
+Node khác máy: java -jar selenium-server-4.4.0.jar node --detect-drivers true --publish-events tcp://<hubIP>:4442 --subscribe-events tcp://<hubIP>:4443
+
+Đặc điểm:
+Linh hoạt: có thể thêm nhiều node ở nhiều máy khác nhau.
+Hub quản lý phân phối test tới node.
+Dùng cho nhóm test vừa và nhỏ.
+Yêu cầu cài driver & browser trên mỗi node.
+
+📌 Khi dùng: muốn chạy test phân tán giữa nhiều máy, nhưng không cần kiến trúc phức tạp.
+
+3️⃣ Distributed Mode
+Đây là mô hình phức tạp nhất, chia grid thành nhiều dịch vụ nhỏ (microservices):
+Các thành phần:
+Session Map - Lưu thông tin session đang chạy.
+java -jar selenium-server-4.4.0.jar sessions
+
+Event Bus - Dùng để gửi/nhận sự kiện giữa các thành phần.
+java -jar selenium-server-4.4.0.jar event-bus
+
+Session Queue - Xếp hàng request khi tất cả node đều bận.
+java -jar selenium-server-4.4.0.jar sessionqueue
+
+Distributor - Quyết định node nào sẽ chạy session.
+java -jar selenium-server-4.4.0.jar distributor \
+  --sessions http://<ip>:5556 \
+  --sessionqueue http://<ip>:5559 \
+  --bind-bus false
+  
+Router - Entry point, nhận request từ test script, gửi tới distributor.
+java -jar selenium-server-4.4.0.jar router \
+  --sessions http://<ip>:5556 \
+  --distributor http://<ip>:5553 \
+  --sessionqueue http://<ip>:5559
+  
+Node - Chạy trình duyệt thực tế, đăng ký với distributor thông qua event bus.
+java -jar selenium-server-4.4.0.jar node \
+  --detect-drivers true \
+  --publish-events tcp://<ip>:4442 \
+  --subscribe-events tcp://<ip>:4443
+  
+Đặc điểm:
+Mạnh mẽ nhất, scale lên hàng trăm node.
+Các thành phần có thể đặt ở nhiều server khác nhau.
+Phù hợp cho CI/CD pipeline lớn hoặc cloud grid.
+Cấu hình phức tạp hơn nhiều so với Classical.
+📌 Khi dùng: cần chạy grid rất lớn, hàng nghìn test song song, nhiều loại môi trường.
+
+💡 Tóm tắt chọn mode:
+Standalone → nhanh, 1 máy, setup đơn giản.
+
+Classical → chia hub/node, phù hợp team vừa.
+
+Distributed → scale cực lớn, dùng cho hệ thống cloud hoặc datacenter.
