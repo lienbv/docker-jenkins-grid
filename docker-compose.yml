@@ -1,0 +1,149 @@
+#version: "3"  # Chỉ định version của Docker Compose syntax.
+#
+#services:  # Khai báo danh sách các container service cần chạy (hub, chrome, firefox).
+#  selenium-hub:  #container trung tâm (Hub) của Selenium Grid.
+#    image: selenium/hub:4.34.0   #Lấy image Selenium Hub v4.34.0 từ Docker Hub.
+#    container_name: selenium-hub   # Tên của container
+#    ports:  #ánh xạ cổng
+#      - "4442:4442"   # Event Bus publish
+#      - "4443:4443"   # Event Bus subscribe
+#      - "4444:4444"   # Grid UI
+#    networks:
+#      - selenium-grid
+#
+##Chạy container node trình duyệt Google Chrome.
+##hm_size: 2gb → cấp Shared Memory (RAM) để tránh lỗi Chrome crash khi mở nhiều tab (fix lỗi “DevToolsActivePort”).
+##depends_on: đảm bảo container Hub chạy trước rồi mới chạy node.
+##environment: truyền các biến môi trường để node nói chuyện với hub:
+#  #SE_EVENT_BUS_HOST=selenium-hub → hub container name (Docker tự resolve DNS).
+#  #SE_EVENT_BUS_PUBLISH_PORT=4442
+#  #SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+#  chrome:
+#    image: selenium/node-chrome:4.34.0
+#    shm_size: 2g
+#    depends_on:
+#      - selenium-hub
+#    environment:
+#      - SE_EVENT_BUS_HOST=selenium-hub
+#      - SE_EVENT_BUS_PUBLISH_PORT=4442
+#      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+#      - SE_NODE_MAX_SESSIONS=2
+#      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+#    deploy:
+#      replicas: 3   # scale ra 3 node Chrome
+#    networks:
+#      - selenium-grid
+#
+#  firefox:
+#    image: selenium/node-firefox:4.34.0
+#    shm_size: 2g
+#    depends_on:
+#      - selenium-hub
+#    environment:
+#      - SE_EVENT_BUS_HOST=selenium-hub
+#      - SE_EVENT_BUS_PUBLISH_PORT=4442
+#      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+#      - SE_NODE_MAX_SESSIONS=2
+#      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+#    deploy:
+#      replicas: 2   # scale ra 2 node Firefox
+#    networks:
+#      - selenium-grid
+#
+#networks:
+#  selenium-grid:
+#    driver: bridge
+
+
+#: Cơ chế hoạt động
+# Trỏ vào thư mục chứa file yml , bật cmd sau đó Run lệnh
+# Run : docker-compose up -d
+#-> Docker sẽ tạo 3 container: selenium-hub, chrome, firefox.
+# +) Các node (chrome, firefox) sẽ tự động đăng ký vào hub qua event bus.
+# +) Viết test Selenium, chỉ cần trỏ driver về hub (RemoteWebDriver)
+# -> Hub sẽ phân phối test xuống node thích hợp (Chrome/Firefox).
+# Tóm lại:
+#selenium-hub = trung tâm điều phối.
+#chrome + firefox = worker node (chạy test).
+#Các biến SE_EVENT_BUS_* giúp node kết nối với hub.
+#shm_size: 2gb để tránh browser bị crash khi chạy headless trong Docker.
+
+# Note: để view được màn hình sử dụng VNC ( debug ) bằng cách :
+# Tải bản selenium/node-chrome-debug về và gắn với port tương ứng.
+
+version: "3.8"
+
+services:
+  selenium-hub:
+    image: selenium/hub:4.34.0
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    networks:
+      - selenium-grid
+
+  chrome:
+    image: selenium/node-chrome:4.34.0
+    container_name: chrome
+    shm_size: 2g
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SCREEN_WIDTH=1920
+      - SCREEN_HEIGHT=1080
+      - SCREEN_DEPTH=24
+    networks:
+      - selenium-grid
+
+  firefox:
+    image: selenium/node-firefox:4.34.0
+    container_name: firefox
+    shm_size: 2g
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SCREEN_WIDTH=1920
+      - SCREEN_HEIGHT=1080
+      - SCREEN_DEPTH=24
+    networks:
+      - selenium-grid
+
+  video_chrome:
+    image: selenium/video:latest
+    container_name: video_chrome
+    volumes:
+      - ./videos:/videos
+    depends_on:
+      - chrome
+    environment:
+      - DISPLAY_CONTAINER_NAME=chrome   # phải trùng container_name ở trên
+      - FILE_NAME=chrome_test.mp4
+      - VIDEO_SIZE=1920x1080
+    networks:
+      - selenium-grid
+
+  video_firefox:
+    image: selenium/video:latest
+    container_name: video_firefox
+    volumes:
+      - ./videos:/videos
+    depends_on:
+      - firefox
+    environment:
+      - DISPLAY_CONTAINER_NAME=firefox  # phải trùng container_name ở trên
+      - FILE_NAME=firefox_test.mp4
+      - VIDEO_SIZE=1920x1080
+    networks:
+      - selenium-grid
+
+networks:
+  selenium-grid:
+    driver: bridge
